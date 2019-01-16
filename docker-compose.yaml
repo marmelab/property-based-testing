@@ -1,0 +1,14 @@
+version: '3.2'
+
+services:
+    client:
+        image: node:10-alpine
+        user: '${UID}:${GID}'
+        volumes:
+            - .:/app
+        command: 'yarn run react-start'
+        environment:
+            - API_URL=http://localhost:3000
+        working_dir: /app
+        ports:
+            - '3000:3000'
