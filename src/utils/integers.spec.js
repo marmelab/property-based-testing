@@ -16,21 +16,27 @@ describe('Negate', () => {
     });
 });
 
-describe('Maths - testcheck', () => {
+describe('testcheck', () => {
     check.it('negate is idempotent', gen.int, x => {
         expect(negate(negate(x))).toEqual(x);
     });
 
-    /* gen() does not work */
+    // gen.int, does no find a counter-example
+    check.it('MacCarthy is equal to 91 for n<=101', gen.int, x => {
+        expect(maccarthy(x)).toEqual(91);
+    });
+
     /*
+     * gen() does not work
+     * have to use gen.object instead
+     */
     const genObj = gen.object({ code: gen.int });
     check.it('negate is idempotent', genObj, obj => {
         expect(negate(negate(obj.code))).toEqual(obj.code);
     });
-    */
 });
 
-describe('Maths - jsverify', () => {
+describe('jsverify', () => {
     it('negate is idempotent', () => {
         expect(
             jsc.checkForall(jsc.integer, x => negate(negate(x)) === x),
@@ -38,8 +44,9 @@ describe('Maths - jsverify', () => {
     });
 
     it('MacCarthy is equal to 91 for n<=101', () => {
+        // jsc.integer(), with no paramater, does no find a counter-example
         expect(
-            jsc.checkForall(jsc.integer(), x => maccarthy(x) === 91),
+            jsc.checkForall(jsc.integer(101), x => maccarthy(x) === 91),
         ).toBeTruthy();
     });
 
@@ -59,7 +66,7 @@ describe('Maths - jsverify', () => {
     });
 });
 
-describe('Maths - fast-check', () => {
+describe('fast-check', () => {
     test('negate is idempotent', () => {
         fc.assert(
             fc.property(fc.integer(), x => {
@@ -76,15 +83,10 @@ describe('Maths - fast-check', () => {
         expect(maccarthy(20)).toEqual(91);
     });
 
-    test('MacCarthy is equal to 91 for all n', () => {
-        for (let i = 0; i < 100; i++) {
-            expect(maccarthy(i)).toEqual(91);
-        }
-    });
-
     test('MacCarthy is equal to 91 for n<=101', () => {
         fc.assert(
-            fc.property(fc.nat(100), x => {
+            // fc.nat(), with no parameter, finds a counter-example
+            fc.property(fc.nat(101), x => {
                 expect(maccarthy(x)).toEqual(91);
             }),
         );
